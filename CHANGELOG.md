@@ -339,3 +339,13 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   SFC_Kount extension
   * Failures during advanced registry loading in ESI requests should be handled
   more gracefully
+
+### jv_customers
+
+  * Implemented logging of flushes + option to enable it in configuration
+  * Bugfix for: The "check if the request is for part of magento" regex does not 
+  match for URLs starting with "/skin/" and "/js/" when a shop has enabled 
+  ‘Add Store Code to Urls’ for all stores.
+  * Implemented lurker-friendly-bans. This will prevent the ban list from growing 
+  big and slowing down Varnish.
+
