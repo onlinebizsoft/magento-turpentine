@@ -340,12 +340,15 @@ This is the first release of Turpentine marked "stable" in Magento Connect
   * Failures during advanced registry loading in ESI requests should be handled
   more gracefully
 
+### RELEASE-0.6.0
+
+  * [#362] Fixed ESI detection for message block (thanks @eth8505)
+  * [#380] Fixed ESI cache flushes not firing in some cases (thanks @gabrielsomoza)
+  * [#391] Added Magento Composer Installer support (thanks @ajardin)
+  * [#405] Fixed disabling Varnish bypass (thanks @ajardin)
+  * [#438] Implemented ban lurker-friendly bans (thanks @jeroenvermeulen)
+
 ### jv_customers
 
   * Implemented logging of flushes + option to enable it in configuration
-  * Bugfix for: The "check if the request is for part of magento" regex does not 
-  match for URLs starting with "/skin/" and "/js/" when a shop has enabled 
-  ‘Add Store Code to Urls’ for all stores.
-  * Implemented lurker-friendly-bans. This will prevent the ban list from growing 
-  big and slowing down Varnish.
-
+  * Fix for caching static URLs - v2 
