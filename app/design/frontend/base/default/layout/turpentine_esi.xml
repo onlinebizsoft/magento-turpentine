@@ -102,19 +102,15 @@
                 </params>
             </action>
         </reference>
-
-        <!-- Messages are not cached because the "messages cleared" event is
-        not reliable -->
         <reference name="global_messages">
             <action method="setEsiOptions">
                 <params>
                     <access>private</access>
-                    <method>ajax</method>
-                    <!-- if this is ever cached we should flush on this event
                     <flush_events>
                         <core_session_abstract_add_message/>
                     </flush_events>
-                    -->
+                    <ttl>3600</ttl>
+                    <only_cache_if_empty>1</only_cache_if_empty>
                 </params>
             </action>
         </reference>
@@ -122,12 +118,11 @@
             <action method="setEsiOptions">
                 <params>
                     <access>private</access>
-                    <method>ajax</method>
-                    <!-- if this is ever cached we should flush on this event
                     <flush_events>
                         <core_session_abstract_add_message/>
                     </flush_events>
-                    -->
+                    <ttl>3600</ttl>
+                    <only_cache_if_empty>1</only_cache_if_empty>
                 </params>
             </action>
         </reference>

@@ -142,6 +142,43 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
     }
 
     /**
+     * Check the magento version and runtime env and set the replace_form_key
+     * flag if needed
+     *
+     * @param Varien_Object $eventObject
+     * @return null
+     */
+    public function setReplaceFormKeyFlag( $eventObject ) {
+        $esiHelper = Mage::helper( 'turpentine/esi' );
+        $varnishHelper = Mage::helper( 'turpentine/varnish' );
+        $request = Mage::app()->getRequest();
+        if( $esiHelper->shouldResponseUseEsi() &&
+                $varnishHelper->csrfFixupNeeded() &&
+                !$request->isPost() ) {
+            Mage::register( 'replace_form_key', true );
+        }
+    }
+
+    /**
+     * Replace the form key placeholder with the ESI include fragment
+     *
+     * @param  Varien_Object $eventObject
+     * @return null
+     */
+    public function replaceFormKeyPlaceholder( $eventObject ) {
+        if( Mage::registry( 'replace_form_key' ) ) {
+            $esiHelper = Mage::helper( 'turpentine/esi' );
+            $response = $eventObject->getResponse();
+            $responseBody = $response->getBody();
+            $responseBody = str_replace( '{{form_key_esi_placeholder}}',
+                $esiHelper->buildEsiIncludeFragment(
+                    $esiHelper->getFormKeyEsiUrl() ),
+                $responseBody );
+            $response->setBody( $responseBody );
+        }
+    }
+
+    /**
      * Encode block data in URL then replace with ESI template
      *
      * @link https://github.com/nexcess/magento-turpentine/wiki/ESI_Cache_Policy
@@ -180,6 +217,8 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
             $dataParam = $esiHelper->getEsiDataParam();
             $methodParam = $esiHelper->getEsiMethodParam();
             $hmacParam = $esiHelper->getEsiHmacParam();
+            $scopeParam = $esiHelper->getEsiScopeParam();
+            $referrerParam = $esiHelper->getEsiReferrerParam();
 
             $esiOptions = $this->_getDefaultEsiOptions( $esiOptions );
 
@@ -211,6 +250,12 @@ class Nexcessnet_Turpentine_Model_Observer_Esi extends Varien_Event_Observer {
                 $urlOptions['_secure'] = Mage::app()->getStore()
                     ->isCurrentlySecure();
             }
+            if( $esiOptions[$scopeParam] == 'page' ) {
+                $urlOptions[$referrerParam]	= Mage::helper('core')->urlEncode(
+                	Mage::getUrl('*/*/*', array('_use_rewrite' => true, '_current' => true))
+                );
+            }
+
             $esiUrl = Mage::getUrl( 'turpentine/esi/getBlock', $urlOptions );
             $blockObject->setEsiUrl( $esiUrl );
             // avoid caching the ESI template output to prevent the double-esi-
