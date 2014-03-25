@@ -100,9 +100,11 @@ class Nexcessnet_Turpentine_EsiController extends Mage_Core_Controller_Front_Act
                 $appShim->shim_setRequest( $dummyRequest );
                 $block = $this->_getEsiBlock( $esiData );
                 if( $block ) {
+                    $blockEsiOptions = $block->getEsiOptions();
                     $block->setEsiOptions( false );
                     $resp->setBody( $block->toHtml() );
-                    if( (int)$req->getParam( $esiHelper->getEsiTtlParam() ) > 0 ) {
+                    if( ( empty($blockEsiOptions['only_cache_if_empty']) || !$resp->getBody() ) &&
+                        (int)$req->getParam( $esiHelper->getEsiTtlParam() ) > 0 ) {
                         $cacheFlag = true;
                     }
                     if( $esiData->getEsiMethod() == 'ajax' ) {
