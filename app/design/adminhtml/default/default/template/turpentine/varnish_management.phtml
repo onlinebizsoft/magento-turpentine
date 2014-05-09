@@ -109,6 +109,33 @@
             </td>
         <?php endif; ?>
     </tr>
+    <tr>
+        <form id="purge_form" name="purge_form" method="post" action="<?php echo $this->getFlushPartialUrl(); ?>">
+            <input name="form_key" type="hidden" value="<?php echo Mage::getSingleton('core/session')->getFormKey() ?>" />
+            <input name="pattern" type="hidden" value="" id="purge_pattern" />
+            <td class="scope-label">
+                <button
+                    onclick="if ($('input_pattern').value.endsWith('/')) {
+                                $('purge_pattern').value = $('input_pattern').value.substring( 0, $('input_pattern').value.length-1 );
+                             } else {
+                                $('purge_pattern').value = $('input_pattern').value;
+                             };
+                             $('purge_pattern').value += $('purge_method').value;
+                             $('purge_form').submit();"
+                    type="button"
+                    class="scalable delete">
+                    <span><?php echo Mage::helper( 'turpentine/data' )->__('Purge URLs') ?></span>
+                </button>
+            </td>
+            <td class="scope-label">
+                <select id="purge_method">
+                    <option value="/?($|\?|#)">matching</option>
+                    <option value=".*">starting with</option>
+                </select>&nbsp;
+                <input class="input-text required-entry" id="input_pattern" style="width: 300px" value="" />
+            </td>
+        </form>
+    </tr>
 </table>
 <?php echo $this->getChildHtml(); ?>
 
