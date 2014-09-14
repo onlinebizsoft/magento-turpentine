@@ -350,56 +350,6 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
             Mage::getStoreConfig( 'turpentine_vcl/params/get_params' ) ) );
     }
 
-    protected function _getIgnoreGetParameters()
-    {
-        /** @var Nexcessnet_Turpentine_Helper_Data $helper */
-        $helper = Mage::helper('turpentine');
-        $ignoredParameters = $helper->cleanExplode(',', Mage::getStoreConfig( 'turpentine_vcl/params/ignore_get_params'));
-        return implode( '|',  $ignoredParameters);
-    }
-
-    /**
-     * Get the Generate Session
-     *
-     * @return string
-     */
-    protected function _getGenerateSessionStart() {
-        return Mage::getStoreConfig( 'turpentine_varnish/general/vcl_fix' )
-            ? '/* -- REMOVED' : '';
-    }
-
-    /**
-     * Get the Generate Session
-     *
-     * @return string
-     */
-    protected function _getGenerateSessionEnd() {
-        return Mage::getStoreConfig( 'turpentine_varnish/general/vcl_fix' )
-            ? '-- */' : '';
-    }
-
-
-    /**
-     * Get the Generate Session
-     *
-     * @return string
-     */
-    protected function _getGenerateSession() {
-        return Mage::getStoreConfig( 'turpentine_varnish/general/vcl_fix' )
-            ? '# call generate_session' : 'call generate_session;';
-    }
-
-
-    /**
-     * Get the Generate Session Expires
-     *
-     * @return string
-     */
-    protected function _getGenerateSessionExpires() {
-        return Mage::getStoreConfig( 'turpentine_varnish/general/vcl_fix' )
-            ? '# call generate_session_expires' : 'call generate_session_expires;';
-    }
-
     /**
      * Get the Force Static Caching option
      *
@@ -561,18 +511,17 @@ abstract class Nexcessnet_Turpentine_Model_Varnish_Configurator_Abstract {
      */
     protected function _cleanVclHelper( $line ) {
         return $line &&
-            ( ( substr( $line, 0, 1 ) != '#' &&
-            substr( $line, 0, 2 ) != '//' ) ||
+            ( substr( $line, 0, 1 ) != '#' ||
+            substr( $line, 0, 2 ) != '//' ||
             substr( $line, 0, 8 ) == '#include' );
     }
 
     /**
      * Format a VCL backend declaration
      *
-     * @param  string $name    name of the backend
-     * @param  string $host    backend host
-     * @param  string $port    backend port
-     * @param  array  $options options
+     * @param  string $name name of the backend
+     * @param  string $host backend host
+     * @param  string $port backend port
      * @return string
      */
     protected function _vcl_backend( $name, $host, $port, $options=array() ) {
@@ -753,7 +702,7 @@ if (req.http.Accept-Encoding) {
         } else if (req.http.Accept-Encoding ~ "deflate") {
             set req.http.Accept-Encoding = "deflate";
         } else {
-            # unknown algorithm
+            # unkown algorithm
             unset req.http.Accept-Encoding;
         }
     }
@@ -777,26 +726,6 @@ EOS;
     }
 
     /**
-     * Get the hostname for cookie normalization
-     *
-     * @return string
-     */
-    protected function _getNormalizeCookieTarget() {
-        return trim( Mage::getStoreConfig(
-            'turpentine_vcl/normalization/cookie_target' ) );
-    }
-
-    /**
-     * Get the regex for cookie normalization
-     *
-     * @return string
-     */
-    protected function _getNormalizeCookieRegex() {
-        return trim( Mage::getStoreConfig(
-            'turpentine_vcl/normalization/cookie_regex' ) );
-    }
-
-    /**
      * Build the list of template variables to apply to the VCL template
      *
      * @return array
@@ -808,20 +737,13 @@ EOS;
             'admin_frontname'   => $this->_getAdminFrontname(),
             'normalize_host_target' => $this->_getNormalizeHostTarget(),
             'url_base_regex'    => $this->getBaseUrlPathRegex(),
-        	'allowed_hosts_regex'	=> $this->getAllowedHostsRegex(),
             'url_excludes'  => $this->_getUrlExcludes(),
             'get_param_excludes'    => $this->_getGetParamExcludes(),
-            'get_param_ignored' => $this->_getIgnoreGetParameters(),
             'default_ttl'   => $this->_getDefaultTtl(),
             'enable_get_excludes'   => ($this->_getGetParamExcludes() ? 'true' : 'false'),
-            'enable_get_ignored' => ($this->_getIgnoreGetParameters()) ? 'true' : 'false',
             'debug_headers' => $this->_getEnableDebugHeaders(),
             'grace_period'  => $this->_getGracePeriod(),
             'force_cache_static'    => $this->_getForceCacheStatic(),
-            'generate_session_expires'    => $this->_getGenerateSessionExpires(),
-            'generate_session'    => $this->_getGenerateSession(),
-            'generate_session_start'    => $this->_getGenerateSessionStart(),
-            'generate_session_end'    => $this->_getGenerateSessionEnd(),
             'static_extensions' => $this->_getStaticExtensions(),
             'static_ttl'    => $this->_getStaticTtl(),
             'url_ttls'      => $this->_getUrlTtls(),
@@ -853,13 +775,7 @@ EOS;
         if( Mage::getStoreConfig( 'turpentine_vcl/normalization/host' ) ) {
             $vars['normalize_host'] = $this->_vcl_sub_normalize_host();
         }
-        if( Mage::getStoreConfig( 'turpentine_vcl/normalization/cookie_regex' ) ) {
-            $vars['normalize_cookie_regex'] = $this->_getNormalizeCookieRegex();
-        }
-        if( Mage::getStoreConfig( 'turpentine_vcl/normalization/cookie_target' ) ) {
-            $vars['normalize_cookie_target'] = $this->_getNormalizeCookieTarget();
-        }
-        
+
         $customIncludeFile = $this->_getCustomIncludeFilename();
         if( is_readable( $customIncludeFile ) ) {
             $vars['custom_vcl_include'] = file_get_contents( $customIncludeFile );
