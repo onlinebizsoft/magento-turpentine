@@ -18,6 +18,10 @@ vcl 4.0;
 
 ## Nexcessnet_Turpentine Varnish v4 VCL Template
 
+## Custom VCL Logic - Top
+
+{{custom_vcl_include_top}}
+
 ## Custom C Code
 
 C{
@@ -28,10 +32,6 @@ C{
 ## Imports
 
 import std;
-
-## Custom VCL Logic
-
-{{custom_vcl_include}}
 
 ## Backends
 
@@ -424,3 +424,7 @@ sub vcl_deliver {
         unset resp.http.X-Varnish-Set-Cookie;
     }
 }
+
+## Custom VCL Logic - Bottom
+
+{{custom_vcl_include}}
