@@ -1044,6 +1044,29 @@ EOS;
     }
 
     /**
+     * Check if "Reuse ESI blocks for new visitors" config setting is enabled.
+     *
+     * @return bool
+     */
+    protected function _reuseNewVisitorEsiBlocks() {
+        return Mage::getStoreConfigFlag('turpentine_varnish/general/reuse_new_visitor_esi_blocks');
+    }
+
+    /**
+     * Get VCL for extra vmod imports
+     *
+     * @return string
+     */
+    protected function _vcl_extra_imports()
+    {
+        $tpl = '';
+        if ($this->_reuseNewVisitorEsiBlocks()) {
+            $tpl .= "import header;\n";
+        }
+        return $tpl;
+    }
+
+    /**
      * Build the list of template variables to apply to the VCL template
      *
      * @return array
@@ -1093,6 +1116,8 @@ EOS;
             'esi_private_ttl'   => Mage::helper('turpentine/esi')
                 ->getDefaultEsiTtl(),
             'set_cookie_domain' => $this->_vcl_sub_set_cookie_domain(),
+            'extra_imports' => $this->_vcl_extra_imports(),
+            'reuse_new_visitor_esi_blocks' => ($this->_reuseNewVisitorEsiBlocks() ? 'true' : 'false'),
         );
 
         if ((bool) Mage::getStoreConfig('turpentine_vcl/urls/bypass_cache_store_url')) {

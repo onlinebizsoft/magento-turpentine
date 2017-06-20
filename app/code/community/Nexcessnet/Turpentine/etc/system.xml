@@ -57,21 +57,44 @@
                             <comment>If whitespace stripping is disabled, generated VCL files will get larger and may exceed the cli_buffer varnish config.</comment>
                             <frontend_type>select</frontend_type>
                             <source_model>turpentine/config_select_stripWhitespace</source_model>
-                            <sort_order>25</sort_order>
+                            <sort_order>22</sort_order>
                             <show_in_default>1</show_in_default>
                             <show_in_website>0</show_in_website>
                             <show_in_store>0</show_in_store>
                         </strip_vcl_whitespace>
                         <vcl_fix translate="label comment">
-                            <label>Use VCL fix</label>
-                            <comment>When Enable is selected, a VCL fix will be used to prevent formKey issues. If Disable is selected, an observer will be used.</comment>
+                            <label>Prevent formKey issues</label>
+                            <comment></comment>
                             <frontend_type>select</frontend_type>
-                            <sort_order>26</sort_order>
-                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <sort_order>24</sort_order>
+                            <source_model>turpentine/config_select_vclFix</source_model>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>1</show_in_store>
                         </vcl_fix>
+                        <reuse_new_visitor_esi_blocks translate="label comment">
+                            <label>Reuse ESI blocks for new visitors</label>
+                            <comment>You need to have the 'header' vmod installed before enabling this.</comment>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>25</sort_order>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                            <depends>
+                                <vcl_fix>0</vcl_fix>
+                            </depends>
+                        </reuse_new_visitor_esi_blocks>
+                        <https_proto_fix translate="label comment">
+                            <label>Set X-Forwarded-Proto Header to HTTPS on port 443</label>
+                            <comment>When using Varnish on port 80 and hitch on port 443 for HTTPS, the fix will set X-Forwarded-Proto header to HTTPS to prevent a re-direct loop.</comment>
+                            <frontend_type>select</frontend_type>
+                            <sort_order>27</sort_order>
+                            <source_model>adminhtml/system_config_source_enabledisable</source_model>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>1</show_in_store>
+                        </https_proto_fix>
                         <https_redirect_fix translate="label comment">
                             <label>Fix HTTPS redirect</label>
                             <comment>When using Varnish as front door listen on port 80 and Nginx/Apache listen on port 443 for HTTPS, the fix will keep the url parameters when redirect from HTTP to HTTPS.</comment>

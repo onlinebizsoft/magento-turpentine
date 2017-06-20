@@ -29,6 +29,7 @@ C{
 
 import std;
 import directors;
+{{extra_imports}}
 
 ## Custom VCL Logic - Top
 
@@ -303,10 +304,14 @@ sub vcl_hash {
 
     if (req.http.X-Varnish-Esi-Access == "private" &&
             req.http.Cookie ~ "frontend=") {
-        std.log("hash_data - frontned cookie: " + regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1"));
-        hash_data(regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1"));
+        if ({{reuse_new_visitor_esi_blocks}} && req.http.Cookie ~ "turpentine_new=1") {
+            std.log("hash_data - cookie: turpentine_new=1, skipping frontend cookie.");
+            hash_data("turpentine_new");
+        } else {
+            std.log("hash_data - frontend cookie: " + regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1"));
+            hash_data(regsub(req.http.Cookie, "^.*?frontend=([^;]*);*.*$", "\1"));
+        }
         {{advanced_session_validation}}
-
     }
     
     if (req.http.X-Varnish-Esi-Access == "customer_group" &&
@@ -440,6 +445,11 @@ sub vcl_deliver {
             }
         }
         set resp.http.Set-Cookie = resp.http.Set-Cookie + "; httponly";
+        if ({{reuse_new_visitor_esi_blocks}}) {
+            # @TODO Apply CookieDomain fixes
+            header.append( resp.http.Set-Cookie, "turpentine_new=1; expires=" + resp.http.X-Varnish-Cookie-Expires +
+                "; path=/; domain=" + req.http.Host + "; httponly" );
+        }
         unset resp.http.X-Varnish-Cookie-Expires;
     }
     if (req.http.X-Varnish-Esi-Method == "ajax" && req.http.X-Varnish-Esi-Access == "private") {
