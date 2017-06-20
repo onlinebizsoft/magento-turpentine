@@ -68,6 +68,9 @@ class Nexcessnet_Turpentine_Model_Observer_Ban extends Varien_Event_Observer {
                             $sessionId );
                 }
             }
+            if ( empty($this->_esiClearFlag) && Mage::app()->getRequest()->getCookie('turpentine_new') ) {
+                Mage::getSingleton('core/cookie')->delete( 'turpentine_new' );
+            }
             $this->_esiClearFlag[] = $eventName;
         }
     }
