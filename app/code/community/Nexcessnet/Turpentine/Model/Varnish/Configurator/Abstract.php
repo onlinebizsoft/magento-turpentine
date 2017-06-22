@@ -1046,11 +1046,11 @@ sub vcl_synth {
         }
         $count = 0;
         foreach ($domain2cookie as $domain => $cookieDomain) {
-            $if = ($count == 0) ? '                    if' : ' elsif';
+            $if = ($count == 0) ? '                if' : ' elsif';
             $tpl .= <<<EOS
 $if (resp.http.X-Varnish-CookieDomain == "$domain") {
-                        set resp.http.X-Varnish-CookieDomain = "$cookieDomain";
-                    }
+                    set resp.http.X-Varnish-CookieDomain = "$cookieDomain";
+                }
 EOS;
             $count++;
         }

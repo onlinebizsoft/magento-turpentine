@@ -428,28 +428,25 @@ sub vcl_deliver {
         set resp.http.Set-Cookie = req.http.X-Varnish-Faked-Session +
             "; expires=" + resp.http.X-Varnish-Cookie-Expires + "; path=/";
         if (req.http.Host) {
+            if (req.http.Host ~ "{{normalize_cookie_regex}}" && "{{normalize_cookie_regex}}" ~ "..") {
+                set resp.http.X-Varnish-CookieDomain = "{{normalize_cookie_target}}";
+            } else {
+                set resp.http.X-Varnish-CookieDomain = regsub(req.http.Host, ":\d+$", "");
+{{set_cookie_domain}}
+            }
             if (req.http.User-Agent ~ "^(?:{{crawler_user_agent_regex}})$") {
                 # it's a crawler, no need to share cookies
                 set resp.http.Set-Cookie = resp.http.Set-Cookie +
                 "; domain=" + regsub(req.http.Host, ":\d+$", "");
             } else {
                 # it's a real user, allow sharing of cookies between stores
-                if (req.http.Host ~ "{{normalize_cookie_regex}}" && "{{normalize_cookie_regex}}" ~ "..") {
-                    set resp.http.Set-Cookie = resp.http.Set-Cookie +
-                    "; domain={{normalize_cookie_target}}";
-                } else {
-                    set resp.http.X-Varnish-CookieDomain = regsub(req.http.Host, ":\d+$", "");
-{{set_cookie_domain}}
-                    set resp.http.Set-Cookie = resp.http.Set-Cookie +
-                    "; domain=" + resp.http.X-Varnish-CookieDomain;
-                }
+                set resp.http.Set-Cookie = resp.http.Set-Cookie + "; domain=" + resp.http.X-Varnish-CookieDomain;
             }
         }
         set resp.http.Set-Cookie = resp.http.Set-Cookie + "; httponly";
-        if ({{reuse_new_visitor_esi_blocks}}) {
-            # @TODO Apply CookieDomain fixes
+        if ({{reuse_new_visitor_esi_blocks}} && resp.http.X-Varnish-CookieDomain) {
             header.append( resp.http.Set-Cookie, "turpentine_new=1; expires=" + resp.http.X-Varnish-Cookie-Expires +
-                "; path=/; domain=" + req.http.Host + "; httponly" );
+                "; path=/; domain=" + resp.http.X-Varnish-CookieDomain + "; httponly" );
         }
         unset resp.http.X-Varnish-Cookie-Expires;
     }
