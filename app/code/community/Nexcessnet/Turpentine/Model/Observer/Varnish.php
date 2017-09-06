@@ -38,6 +38,25 @@ class Nexcessnet_Turpentine_Model_Observer_Varnish extends Varien_Event_Observer
                     'Set Varnish cache flag header to: '.
                     (Mage::registry('turpentine_nocache_flag') ? '0' : '1') );
             }
+
+            $cacheTags = array();
+
+            $category = Mage::registry( 'current_category' );
+            if ( $category instanceof Mage_Catalog_Model_Category ) {
+                $cacheTags[] = 'C'.$category->getId();
+            }
+            $layer = Mage::getSingleton('catalog/layer');
+            if ( $layer instanceof Mage_Catalog_Model_Layer ) {
+                foreach( $layer->getProductCollection() as $product ) {
+                    $cacheTags[] = 'P'.$product->getId();
+                }
+            }
+            $product  = Mage::registry( 'current_product' );
+            if ( $product instanceof Mage_Catalog_Model_Product ) {
+                $cacheTags[] = 'P'.$product->getId();
+            }
+            $cacheTags = array_unique($cacheTags);
+            $response->setHeader('X-Turpentine-Tags', "," . implode(",",$cacheTags) . "," );
         }
     }
 
