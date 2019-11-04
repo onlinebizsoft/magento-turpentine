@@ -482,7 +482,7 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
 * [#1410] Fix issue #1409: Solved by keeping Cache-Control header @jeroenvermeulen
 * [#1423] Fixes for #1404 #1361 #1423
 
-### 2019-11-04
+### 20191104
 * [#1415] Fix for custom cookie domain @jeroenvermeulen
 * [#1530] Only apped URL params to the ESI URL when scope=page @jeroenvermeulen
 * [#1538] Fix wrong skin, template, locale in ESI blocks @felixbuenemann
