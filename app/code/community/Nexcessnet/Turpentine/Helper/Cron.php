@@ -191,8 +191,8 @@ class Nexcessnet_Turpentine_Helper_Cron extends Mage_Core_Helper_Abstract {
                     $urls[] = $prod->getProductUrl();
                 }
             }
-            $sitemap = (Mage::getConfig()->getNode('modules/MageWorx_XSitemap') !== FALSE) ?
-                                                           'xsitemap/cms_page' : 'sitemap/cms_page';
+            $sitemap = (Mage::getConfig()->getNode('modules/MageWorx_XSitemap') !== false) ?
+                                                           'mageworx_xsitemap/cms_page' : 'sitemap/cms_page';
             foreach (Mage::getResourceModel($sitemap)
                         ->getCollection($storeId) as $item) {
                 $urls[] = $baseUrl.$item->getUrl();
