@@ -481,3 +481,7 @@ Magento CE 1.8+ or EE 1.13+, see [these instructions](https://github.com/nexcess
 * [#1405] When using hitch, we need to set http.X-Forwarded-Proto to HTTPS @craigcarnell
 * [#1410] Fix issue #1409: Solved by keeping Cache-Control header @jeroenvermeulen
 * [#1423] Fixes for #1404 #1361 #1423
+
+### 2019-11-04
+* [1415] Fix for custom cookie domain 
+* [1530] Only apped URL params to the ESI URL when scope=page 
