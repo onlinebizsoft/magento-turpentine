@@ -438,7 +438,7 @@ EOS;
      */
     protected function _getGenerateSession() {
         return Mage::getStoreConfigFlag('turpentine_varnish/general/vcl_fix')
-            ? 'return (pipe);' : 'call generate_session;';
+            ? '' : 'call generate_session;';
     }
 
 
